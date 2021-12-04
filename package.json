@@ -1,0 +1,19 @@
+{
+  "name": "predb-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "crackhub213",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "irc": "^0.5.2",
+    "irc-formatting": "^1.0.0-rc3",
+    "mongoose": "^6.0.14"
+  }
+}
