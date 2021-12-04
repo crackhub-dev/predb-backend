@@ -14,6 +14,7 @@ const Pre = mongoose.model("pre", {
     cat: { type: String },
 
 });
+//feel free to switch out the userName here, but it is not important.
 var client = new irc.Client('irc.corrupt-net.org', 'ts2983', {
     channels: ['#Pre'],
     port: 6667
