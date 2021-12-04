@@ -7,7 +7,7 @@ git clone https://github.com/crackhub-dev/predb-backend.git
 cd predb-backend/
 npm install
 ```
-Creat `.env` in the same folder as `server.js` and fill this in with your info:
+Create `.env` in the same folder as `server.js` and fill this in with your info:
 
 ```
 MONGODB_URI=
