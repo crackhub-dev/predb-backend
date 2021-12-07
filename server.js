@@ -5,6 +5,7 @@ var ircf = require('irc-formatting');
 const env = require('dotenv').config();
 const mongoose = require('mongoose');
 
+
 const port = process.env.PORT;
 const database_uri = process.env.MONGODB_URI;
 mongoose.connect(database_uri)
@@ -14,7 +15,6 @@ const Pre = mongoose.model("pre", {
     cat: { type: String },
 
 });
-//feel free to switch out the userName here, but it is not important.
 var client = new irc.Client('irc.corrupt-net.org', 'ts2983', {
     channels: ['#Pre'],
     port: 6667
@@ -92,5 +92,10 @@ app.get("/api/getDate/:id", (req, res) => {
         return res.json({ date: new mongoose.Types.ObjectId(id).getTimestamp().toLocaleString() });
     });
 });
-
+app.get("/api/length", (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    let length = Pre.find({}, function(err, length) {
+        return res.json({ length: length.length });
+    });
+});
 app.listen(port, () => console.log(` listening on port ${port}!`));
