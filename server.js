@@ -13,9 +13,10 @@ mongoose.connect(database_uri)
 const Pre = mongoose.model("pre", {
     rls: { type: String },
     cat: { type: String },
+    grp: { type: String }
 
 });
-var client = new irc.Client('irc.corrupt-net.org', 'ts2983', {
+var client = new irc.Client('irc.corrupt-net.org', 'pre5999', {
     channels: ['#Pre'],
     port: 6667
 });
@@ -26,9 +27,12 @@ client.addListener('message', function(from, to, message) {
     if (msg_arr[0].text == "PRE:") {
         let cat = msg_arr[2].text.replace(/\n/g, ' ').replace(' ', '');
         let rls = msg_arr[3].text.replace(/\n/g, ' ').replace(']', '').replace(' ', '');
+        let rlsarr = rls.split("-");
+        let grp = rlsarr[rlsarr.length -1];
         let pre = new Pre({
             rls: rls,
-            cat: cat
+            cat: cat,
+            grp: grp
         });
         pre.save(function(err, pre) {
             if (err) return console.error(err);
@@ -71,6 +75,18 @@ app.get("/api/cat", (req, res) => {
     let page = req.query.p;
     let limit = req.query.l;
     search = Pre.find({ cat: { "$regex": q, "$options": "i" } }, function(err, q) {
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+        const currentPage = q.slice(startIndex, endIndex);
+        res.json(currentPage);
+    }).sort({ _id: -1 });
+});
+app.get("/api/grp", (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    let q = req.query.q;
+    let page = req.query.p;
+    let limit = req.query.l;
+    search = Pre.find({ grp: { "$regex": q, "$options": "i" } }, function(err, q) {
         const startIndex = (page - 1) * limit;
         const endIndex = page * limit;
         const currentPage = q.slice(startIndex, endIndex);
