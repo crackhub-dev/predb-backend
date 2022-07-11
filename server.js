@@ -110,8 +110,8 @@ app.get("/api/getDate/:id", (req, res) => {
 });
 app.get("/api/length", (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
-    let length = Pre.find({}, function(err, length) {
-        return res.json({ length: length.length });
+    let length = Pre.count({}, function(err, count) {
+        return res.json({ length: count });
     });
 });
 app.listen(port, () => console.log(` listening on port ${port}!`));
