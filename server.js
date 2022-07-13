@@ -13,14 +13,12 @@ mongoose.connect(database_uri)
 const Pre = mongoose.model("pre", {
     rls: { type: String },
     cat: { type: String },
-    grp: { type: String }
-
+    grp: { type: String },
 });
-var client = new irc.Client('irc.corrupt-net.org', 'pre5999', {
+var client = new irc.Client('irc.corrupt-net.org', 'ts2983', {
     channels: ['#Pre'],
     port: 6667
 });
-
 
 client.addListener('message', function(from, to, message) {
     let msg_arr = ircf.parse(message);
@@ -28,7 +26,7 @@ client.addListener('message', function(from, to, message) {
         let cat = msg_arr[2].text.replace(/\n/g, ' ').replace(' ', '');
         let rls = msg_arr[3].text.replace(/\n/g, ' ').replace(']', '').replace(' ', '');
         let rlsarr = rls.split("-");
-        let grp = rlsarr[rlsarr.length -1];
+        let grp = rlsarr[rlsarr.length - 1];
         let pre = new Pre({
             rls: rls,
             cat: cat,
@@ -42,57 +40,53 @@ client.addListener('message', function(from, to, message) {
         console.log("Nuke");
     }
 });
+
 app.get('/api/releases', (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     const filter = {};
-    let page = req.query.p;
-    let limit = req.query.l;
-    const all = Pre.find(filter, function(err, filter) {
-        const startIndex = (page - 1) * limit;
-        const endIndex = page * limit;
-        const currentPage = filter.slice(startIndex, endIndex);
-        res.json(currentPage);
-    }).sort({ _id: -1 });
+    let limit = Math.abs(req.query.l) || 10;
+    let page = (Math.abs(req.query.p) || 1) - 1;
+    const find = Pre.find(filter, function(err, filter) {
+        res.json(filter);
+    }).limit(limit).skip(limit * page).sort({ _id: -1 })
 });
 
 app.get("/api/search", (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     let q = req.query.q;
-    let page = req.query.p;
-    let limit = req.query.l;
+    let limit = Math.abs(req.query.l) || 10;
+    let page = (Math.abs(req.query.p) || 1) - 1;
+    if (q.length < 3) {
+        return res.status(400).json({ "error": "'q' must be at least 3 characters" });
+    }
     search = Pre.find({ rls: { "$regex": q, "$options": "i" } }, function(err, q) {
-        const startIndex = (page - 1) * limit;
-        const endIndex = page * limit;
-        const currentPage = q.slice(startIndex, endIndex);
-        res.json(currentPage);
-    }).sort({ _id: -1 });
+        res.json(q);
+    }).limit(limit).skip(limit * page).sort({ _id: -1 }).sort({ _id: -1 });
 });
-
 
 app.get("/api/cat", (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     let q = req.query.q;
-    let page = req.query.p;
-    let limit = req.query.l;
+    let limit = Math.abs(req.query.l) || 10;
+    let page = (Math.abs(req.query.p) || 1) - 1;
     search = Pre.find({ cat: { "$regex": q, "$options": "i" } }, function(err, q) {
-        const startIndex = (page - 1) * limit;
-        const endIndex = page * limit;
-        const currentPage = q.slice(startIndex, endIndex);
-        res.json(currentPage);
-    }).sort({ _id: -1 });
+
+        res.json(q);
+    }).limit(limit).skip(limit * page).sort({ _id: -1 });
 });
+
+
 app.get("/api/grp", (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     let q = req.query.q;
-    let page = req.query.p;
-    let limit = req.query.l;
+    let limit = Math.abs(req.query.l) || 10;
+    let page = (Math.abs(req.query.p) || 1) - 1;
     search = Pre.find({ grp: { "$regex": q, "$options": "i" } }, function(err, q) {
-        const startIndex = (page - 1) * limit;
-        const endIndex = page * limit;
-        const currentPage = q.slice(startIndex, endIndex);
-        res.json(currentPage);
-    }).sort({ _id: -1 });
+        res.json(q);
+    }).limit(limit).skip(limit * page).sort({ _id: -1 });
 });
+
+
 app.get("/api/rls/:id", (req, res) => {
     res.header("Access-Control-Allow-Origin", "*");
     let id = req.params.id;
